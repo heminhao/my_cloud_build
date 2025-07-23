@@ -13,7 +13,7 @@ jobs:
   build-win32:
     runs-on: windows-latest
     env:
-      PATH: C:\ProgramData\chocolatey\bin;${{ env.PATH }}
+      PATH: C:\ProgramData\chocolatey\bin;${{ runner.env.PATH }}
     steps:
       #- name: Debug list VS2022 install dirs (bare format)
       #  shell: cmd
