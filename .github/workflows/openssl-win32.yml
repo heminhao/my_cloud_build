@@ -32,7 +32,9 @@ jobs:
 
       - name: Install prerequisites
         shell: pwsh
-        run: choco install strawberryperl nasm -y
+        run: |
+          choco install strawberryperl nasm -y
+          refreshenv
 
       - name: Setup MSVC x86 environment
         shell: cmd
