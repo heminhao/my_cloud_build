@@ -1,0 +1,66 @@
+
+name: Build OpenSSL Win32
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'OpenSSL tag'
+        required: true
+        default: 'openssl-3.5.1'
+
+jobs:
+  build-win32:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout official OpenSSL
+        uses: actions/checkout@v4
+        with:
+          repository: 'openssl/openssl'
+          fetch-depth: 0
+          path: 'openssl-src'
+
+      - name: Checkout tag
+        run: |
+          cd openssl-src
+          git checkout ${{ github.event.inputs.tag }}
+
+      - name: Install prerequisites
+        shell: pwsh
+        run: choco install strawberryperl nasm -y
+
+      - name: Setup MSVC x86 environment
+        shell: cmd
+        run: '"C:\Program Files\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvarsall.bat" x86'
+
+      - name: Configure OpenSSL
+        shell: cmd
+        run: |
+          cd openssl-src
+          perl Configure VC-WIN32 --prefix=%CD%\openssl-install
+
+      - name: Build OpenSSL
+        shell: cmd
+        run: |
+          cd openssl-src
+          nmake
+
+      - name: Test OpenSSL
+        shell: cmd
+        run: |
+          cd openssl-src
+          nmake test
+
+      - name: Install OpenSSL artifacts
+        shell: cmd
+        run: |
+          cd openssl-src
+          nmake install
+
+      - name: Upload compiled libraries
+        uses: actions/upload-artifact@v4
+        with:
+          name: openssl-win32
+          path: openssl-src/openssl-install
+
