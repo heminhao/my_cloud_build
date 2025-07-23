@@ -36,7 +36,7 @@ jobs:
         
       - name: Add choco bin to PATH
         shell: cmd
-        run: echo C:\ProgramData\chocolatey\bin>>"%GITHUB_PATH%"
+        run: echo C:\ProgramData\chocolatey\bin >> %GITHUB_PATH%
 
       - name: Setup environment and compile test install
         shell: cmd
