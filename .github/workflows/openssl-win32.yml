@@ -37,6 +37,12 @@ jobs:
       #- name: Add choco bin to PATH
       #  shell: cmd
       #  run: echo C:\ProgramData\chocolatey\bin >> %GITHUB_PATH%
+      
+      - name: Debug Find nasm via CMD
+        shell: cmd
+        run: |
+          echo Searching for nasm.exe on C: drive...
+          where /R C:\ nasm.exe || echo "nasm not found"
 
       - name: Setup environment and compile test install
         shell: cmd
