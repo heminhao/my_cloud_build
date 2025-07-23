@@ -36,35 +36,16 @@ jobs:
         
       - name: Add choco bin to PATH
         shell: cmd
-        run: |
-          echo PATH=C:\ProgramData\chocolatey\bin;%PATH% >> %GITHUB_ENV%
+        run: echo C:\ProgramData\chocolatey\bin>>"%GITHUB_PATH%"
 
-      - name: Setup MSVC x86 environment
-        shell: cmd
-        run: '"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x86'
-
-      - name: Configure OpenSSL
+      - name: Setup environment and compile test install
         shell: cmd
         run: |
+          '"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x86'
           cd openssl-src
           perl Configure VC-WIN32 --prefix=%CD%\openssl-install
-
-      - name: Build OpenSSL
-        shell: cmd
-        run: |
-          cd openssl-src
           nmake
-
-      - name: Test OpenSSL
-        shell: cmd
-        run: |
-          cd openssl-src
           nmake test
-
-      - name: Install OpenSSL artifacts
-        shell: cmd
-        run: |
-          cd openssl-src
           nmake install
 
       - name: Upload compiled libraries
