@@ -12,8 +12,7 @@ on:
 jobs:
   build-win32:
     runs-on: windows-latest
-    env:
-      PATH: C:\ProgramData\chocolatey\bin;${{ runner.env.PATH }}
+
     steps:
       #- name: Debug list VS2022 install dirs (bare format)
       #  shell: cmd
@@ -34,6 +33,11 @@ jobs:
       - name: Install prerequisites
         shell: pwsh
         run: choco install strawberryperl nasm -y
+        
+      - name: Add choco bin to PATH
+        shell: cmd
+        run: |
+          echo C:\ProgramData\chocolatey\bin >> %GITHUB_PATH%
 
       - name: Setup MSVC x86 environment
         shell: cmd
