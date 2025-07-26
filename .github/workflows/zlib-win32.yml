@@ -1,0 +1,48 @@
+name: Build zlib Win32
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Zlib tag'
+        required: true
+        default: 'v1.3.1'
+
+jobs:
+  build-win32:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout zlib
+        uses: actions/checkout@v4
+        with:
+          repository: 'madler/zlib'
+          fetch-depth: 0
+          path: zlib-src
+
+      - name: Checkout tag
+        shell: bash
+        run: |
+          cd zlib-src
+          git checkout ${{ github.event.inputs.tag }}
+
+      - name: Setup environment and build
+        shell: cmd
+        run: |
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x86
+          cd zlib-src
+          nmake -f win32\Makefile.msc
+          set INSTALL_DIR=%GITHUB_WORKSPACE%\zlib-install
+          if not exist "%INSTALL_DIR%" mkdir "%INSTALL_DIR%"
+          if not exist "%INSTALL_DIR%\lib" mkdir "%INSTALL_DIR%\lib"
+          if not exist "%INSTALL_DIR%\include" mkdir "%INSTALL_DIR%\include"
+          copy zlib.lib "%INSTALL_DIR%\lib\"
+          copy zlib1.dll "%INSTALL_DIR%\lib\"
+          copy zdll.lib "%INSTALL_DIR%\lib\"
+          copy zlib.h "%INSTALL_DIR%\include\"
+          copy zconf.h "%INSTALL_DIR%\include\"
+
+      - name: Upload compiled library
+        uses: actions/upload-artifact@v4
+        with:
+          name: zlib-win32-install
+          path: zlib-install
