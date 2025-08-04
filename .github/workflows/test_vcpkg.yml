@@ -1,4 +1,4 @@
-name: Build zlib Win32
+name: test_vcpkg
 
 on:
   workflow_dispatch:
