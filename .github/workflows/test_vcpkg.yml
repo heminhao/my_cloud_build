@@ -43,7 +43,7 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: vcpkg-libwebsockets4.3.5-nlohmann-json3.12.0
+          tag_name: vcpkg-libwebsockets-nlohmann-json_bin
           files: |
             vcpkg_installed/vcpkg_dependencies_${{ matrix.myarch }}.zip
         env:
