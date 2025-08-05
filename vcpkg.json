@@ -1,4 +1,3 @@
-
 {
   "name": "hft-test",
   "version-string": "0.1.0",
@@ -11,5 +10,6 @@
       "name": "nlohmann-json",
       "version>=": "3.12.0"
     }
-  ]
+  ],
+  "builtin-baseline": "8cce1e1118ea2569d5117f096035671a8490b8f4"
 }
