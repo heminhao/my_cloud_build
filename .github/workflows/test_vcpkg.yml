@@ -17,8 +17,8 @@ jobs:
       matrix:
         myarch: [x86-windows, x64-windows]
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      #- name: Checkout repository
+      #  uses: actions/checkout@v4
 
       - name: Install vcpkg
         shell: cmd
@@ -30,7 +30,7 @@ jobs:
       - name: Run vcpkg install for libwebsockets
         shell: cmd
         run: |
-          .\vcpkg\vcpkg.exe install --triplet ${{ matrix.myarch }}
+          .\vcpkg\vcpkg.exe install libwebsockets[version=4.3.5]:${{ matrix.myarch }} nlohmann-json[version=3.12.0]:${{ matrix.myarch }}
 
       - name: Package vcpkg dependencies
         shell: cmd
