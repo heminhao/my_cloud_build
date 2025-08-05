@@ -1,4 +1,6 @@
 name: test_vcpkg
+permissions:
+  contents: write
 
 on:
   workflow_dispatch:
@@ -9,17 +11,40 @@ on:
         default: 'demo'
 
 jobs:
-  build-win32:
+  build-deps:
     runs-on: windows-latest
+    strategy:
+      matrix:
+        myarch: [x86-windows, x64-windows]
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Install vcpkg
         shell: cmd
         run: |
           git clone https://github.com/microsoft/vcpkg.git
+          git checkout 2025.07.25
           .\vcpkg\bootstrap-vcpkg.bat
-      
+
       - name: Run vcpkg install for libwebsockets
         shell: cmd
         run: |
-          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x86
-          .\vcpkg\vcpkg.exe install libwebsockets:x86-windows
+          .\vcpkg\vcpkg.exe install libwebsockets:${{ matrix.myarch }} nlohmann-json:${{ matrix.myarch }}
+
+      - name: Package vcpkg dependencies
+        shell: cmd
+        run: |
+          cd vcpkg_installed
+          dir
+          powershell -Command "Compress-Archive -Path .\\${{ matrix.myarch }} -DestinationPath vcpkg_dependencies_${{ matrix.myarch }}.zip"
+
+      - name: Upload to GitHub Releases
+        if: github.event_name == 'workflow_dispatch'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: vcpkg-libwebsockets4.3.5-nlohmann-json3.12.0
+          files: |
+            vcpkg_dependencies_${{ matrix.myarch }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
