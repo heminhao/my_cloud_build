@@ -30,7 +30,7 @@ jobs:
       - name: Run vcpkg install for libwebsockets
         shell: cmd
         run: |
-          .\vcpkg\vcpkg.exe install libwebsockets:${{ matrix.myarch }} nlohmann-json:${{ matrix.myarch }}
+          .\vcpkg\vcpkg.exe install --triplet ${{ matrix.myarch }}
 
       - name: Package vcpkg dependencies
         shell: cmd
