@@ -1,15 +1,15 @@
 
 {
-  "name": "hft_test",
+  "name": "hft-test",
   "version-string": "0.1.0",
   "dependencies": [
     {
       "name": "libwebsockets",
-      "version": "4.3.5"
+      "version>=": "4.3.5"
     },
     {
       "name": "nlohmann-json",
-      "version": "3.12.0"
+      "version>=": "3.12.0"
     }
   ]
 }
