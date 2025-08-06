@@ -56,6 +56,7 @@ jobs:
         shell: powershell
         run: |
           New-Item -ItemType Directory -Path vcpkg_installed
+          New-Item -ItemType Directory -Path vcpkg_installed\vcpkg\info
           Copy-Item -Recurse tmp/x86/x86-windows vcpkg_installed
           Copy-Item -Recurse tmp/x64/x64-windows vcpkg_installed
           Copy-Item -Recurse tmp/x86/vcpkg/info/* vcpkg_installed/vcpkg/info
