@@ -39,6 +39,12 @@ jobs:
           name: vcpkg-${{ matrix.myarch }}
           path: vcpkg_installed
 
+      - name: Cache vcpkg_installed
+        uses: actions/cache@v3
+        with:
+          path: vcpkg_installed
+          key: vcpkg-${{ matrix.myarch }}
+
   package-all:
     needs: build-deps
     runs-on: windows-latest
