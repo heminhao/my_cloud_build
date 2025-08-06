@@ -40,7 +40,7 @@ jobs:
           path: vcpkg_installed
 
       - name: Cache vcpkg_installed
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: vcpkg_installed
           key: vcpkg-${{ matrix.myarch }}
