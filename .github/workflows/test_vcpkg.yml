@@ -24,19 +24,60 @@ jobs:
         shell: cmd
         run: |
           git clone https://github.com/microsoft/vcpkg.git
+          cd vcpkg
           git checkout 2025.07.25
+          cd ..
           .\vcpkg\bootstrap-vcpkg.bat
 
-      - name: Run vcpkg install for libwebsockets
+      - name: Run vcpkg install
         shell: cmd
         run: |
           .\vcpkg\vcpkg.exe install --triplet ${{ matrix.myarch }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vcpkg-${{ matrix.myarch }}
+          path: vcpkg_installed
+
+  package-all:
+    needs: build-deps
+    runs-on: windows-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: vcpkg-x86-windows
+          path: tmp/x86
+      - uses: actions/download-artifact@v4
+        with:
+          name: vcpkg-x64-windows
+          path: tmp/x64
+
+      - name: Merge triplet folders
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Path vcpkg_installed
+          Copy-Item -Recurse tmp/x86/x86-windows vcpkg_installed
+          Copy-Item -Recurse tmp/x64/x64-windows vcpkg_installed
+          Copy-Item -Recurse tmp/x86/vcpkg/info/* vcpkg_installed/vcpkg/info
+          Copy-Item -Recurse tmp/x64/vcpkg/info/* vcpkg_installed/vcpkg/info
+
+      - name: Rebuild status file
+        shell: cmd
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git
+          cd vcpkg
+          git checkout 2025.07.25
+          cd ..
+          .\vcpkg\bootstrap-vcpkg.bat
+          .\vcpkg\vcpkg.exe list
 
       - name: Package vcpkg dependencies
         shell: cmd
         run: |
           cd vcpkg_installed
-          powershell -Command "Compress-Archive -Path .\\${{ matrix.myarch }} -DestinationPath vcpkg_dependencies_${{ matrix.myarch }}.zip"
+          powershell -Command "Compress-Archive -Path .\\x86-windows -DestinationPath vcpkg_dependencies_x86-windows.zip"
+          powershell -Command "Compress-Archive -Path .\\x64-windows -DestinationPath vcpkg_dependencies_x64-windows.zip"
+          powershell -Command "Compress-Archive -Path .\\vcpkg -DestinationPath vcpkg_dependencies_vcpkg.zip"
           dir
 
       - name: Upload to GitHub Releases
@@ -45,6 +86,9 @@ jobs:
         with:
           tag_name: vcpkg-libwebsockets-nlohmann-json_bin
           files: |
-            vcpkg_installed/vcpkg_dependencies_${{ matrix.myarch }}.zip
+            vcpkg_installed/vcpkg_dependencies_x86-windows.zip
+            vcpkg_installed/vcpkg_dependencies_x64-windows.zip
+            vcpkg_installed/vcpkg_dependencies_vcpkg.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
