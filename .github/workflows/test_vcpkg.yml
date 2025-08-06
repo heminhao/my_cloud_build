@@ -16,6 +16,8 @@ jobs:
     strategy:
       matrix:
         myarch: [x86-windows, x64-windows]
+    env:
+      ACTIONS_STEP_DEBUG: true
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -44,6 +46,7 @@ jobs:
         with:
           path: vcpkg_installed
           key: vcpkg-${{ matrix.myarch }}
+          enableCrossOsArchive: false
 
   package-all:
     needs: build-deps
