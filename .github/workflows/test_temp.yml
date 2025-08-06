@@ -23,6 +23,18 @@ jobs:
           Write-Host "REF=$env:GITHUB_REF"
           Write-Host "EVENT=$env:GITHUB_EVENT_NAME"
           Write-Host "OS=$env:RUNNER_OS"
+          
+      - name: List caches for main branch
+        shell: powershell
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $uri = "https://api.github.com/repos/${{ github.repository }}/actions/caches?ref=refs/heads/main"
+          $headers = @{ Authorization = "Bearer $env:GH_TOKEN"; Accept = "application/vnd.github+json" }
+          $resp = Invoke-RestMethod -Uri $uri -Headers $headers
+          $resp.actions_caches |
+            Select-Object id, key, size_in_bytes, usage_count, created_at, last_accessed_at |
+            Format-Table -AutoSize
 
       - name: read Cache x86
         uses: actions/cache@v3
