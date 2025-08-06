@@ -16,7 +16,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
+
+      - name: Env check (PowerShell)
+        shell: powershell
+        run: |
+          Write-Host "REF=$env:GITHUB_REF"
+          Write-Host "EVENT=$env:GITHUB_EVENT_NAME"
+          Write-Host "OS=$env:RUNNER_OS"
+
       - name: read Cache x86
         uses: actions/cache@v3
         with:
