@@ -35,8 +35,12 @@ jobs:
           $resp.actions_caches |
             Select-Object id, key, size_in_bytes, usage_count, created_at, last_accessed_at |
             Format-Table -AutoSize
-          $cache = (Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/actions/caches/842246349" -Headers @{Authorization="Bearer ${{ secrets.GITHUB_TOKEN }}";Accept="application/vnd.github+json"})
-          $cache | Select-Object key,complete,archive_download_url | Format-Table -AutoSize
+          $key   = "vcpkg-x86-windows"
+          $uri   = "https://api.github.com/repos/$env:GITHUB_REPOSITORY/actions/caches?key=$key&ref=refs/heads/main"
+          $result = Invoke-RestMethod -Uri $uri -Headers $headers
+          $result.actions_caches |
+            Select-Object key, size_in_bytes, complete, archive_download_url |
+            Format-Table -Auto
 
       - name: read Cache x86
         uses: actions/cache@v3
