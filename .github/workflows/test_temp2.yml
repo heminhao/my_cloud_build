@@ -23,9 +23,9 @@ jobs:
           repo: heminhao/my_cloud_build
           token: ${{ secrets.GITHUB_TOKEN }}
           version: tags/vcpkg-libwebsockets-nlohmann-json_bin
-          file: 'vcpkg-*.zip'
-          target: 'downloads'
-          regex: false
+          file: '^vcpkg_.*\.zip$'
+          target: downloads/
+          regex: true
 
       - name: Unzip all
         shell: pwsh
