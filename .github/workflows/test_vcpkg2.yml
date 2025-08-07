@@ -29,19 +29,19 @@ jobs:
           cd ..
           call .\vcpkg\bootstrap-vcpkg.bat
 
-      - name: Install deps for ${{ matrix.triplet }}
+      - name: Install deps for ${{ matrix.myarch }}
         shell: cmd
         run: |
-          set INSROOT=install-root-${{ matrix.triplet }}
-          .\vcpkg\vcpkg.exe install --triplet ${{ matrix.triplet }} --x-install-root=%INSROOT%
+          set INSROOT=install-root-${{ matrix.myarch }}
+          .\vcpkg\vcpkg.exe install --triplet ${{ matrix.myarch }} --x-install-root=%INSROOT%
 
-      - name: Export ZIP for ${{ matrix.triplet }}
+      - name: Export ZIP for ${{ matrix.myarch }}
         shell: cmd
         run: |
-          set INSROOT=install-root-${{ matrix.triplet }}
-          .\vcpkg\vcpkg.exe export --zip --raw --output=vcpkg-deps-${{ matrix.triplet }}.zip --x-install-root=%INSROOT%
+          set INSROOT=install-root-${{ matrix.myarch }}
+          .\vcpkg\vcpkg.exe export --zip --raw --output=vcpkg-deps-${{ matrix.myarch }}.zip --x-install-root=%INSROOT%
 
       - uses: actions/upload-artifact@v4
         with:
-          name: vcpkg-deps-${{ matrix.triplet }}
-          path: vcpkg-deps-${{ matrix.triplet }}.zip
+          name: vcpkg-deps-${{ matrix.myarch }}
+          path: vcpkg-deps-${{ matrix.myarch }}.zip
