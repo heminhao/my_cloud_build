@@ -1,0 +1,47 @@
+name: test_vcpkg2
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'test'
+        required: false
+        default: 'demo'
+
+jobs:
+  build-deps:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        myarch: [x86-windows, x64-windows]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install vcpkg
+        shell: cmd
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git
+          cd vcpkg
+          git checkout 2025.07.25
+          cd ..
+          call .\vcpkg\bootstrap-vcpkg.bat
+
+      - name: Install deps for ${{ matrix.triplet }}
+        shell: cmd
+        run: |
+          set INSROOT=install-root-${{ matrix.triplet }}
+          .\vcpkg\vcpkg.exe install --triplet ${{ matrix.triplet }} --x-install-root=%INSROOT%
+
+      - name: Export ZIP for ${{ matrix.triplet }}
+        shell: cmd
+        run: |
+          set INSROOT=install-root-${{ matrix.triplet }}
+          .\vcpkg\vcpkg.exe export --zip --raw --output=vcpkg-deps-${{ matrix.triplet }}.zip --x-install-root=%INSROOT%
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vcpkg-deps-${{ matrix.triplet }}
+          path: vcpkg-deps-${{ matrix.triplet }}.zip
