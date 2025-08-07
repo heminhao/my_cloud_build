@@ -1,0 +1,75 @@
+name: test_temp2
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'temp2'
+        required: false
+        default: 'demo'
+
+jobs:
+  package-all:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - uses: dawidd6/action-download-release-assets@v2
+        with:
+          repository: ${{ github.repository }}
+          tag: vcpkg-libwebsockets-nlohmann-json_bin
+          file: vcpkg-*.zip
+          path: downloads
+
+      - name: Unzip all
+        shell: pwsh
+        run: |
+          Expand-Archive downloads\vcpkg_dependencies_x86-windows.zip -DestinationPath tmp/x86 -Force
+          Expand-Archive downloads\vcpkg_dependencies_x64-windows.zip -DestinationPath tmp/x64 -Force
+          Expand-Archive downloads\vcpkg_dependencies_vcpkg.zip -DestinationPath tmp/vcp -Force
+
+      - name: Merge triplet folders
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Path vcpkg_installed
+          New-Item -ItemType Directory -Path vcpkg_installed\vcpkg\info
+          Copy-Item -Recurse tmp/x86/x86-windows vcpkg_installed
+          Copy-Item -Recurse tmp/x64/x64-windows vcpkg_installed
+          Copy-Item -Recurse tmp/vcp/vcpkg/info/* vcpkg_installed/vcpkg/info
+          #Move-Item -Force -Recurse vcpkg_installed ../my_cloud_build
+
+      - name: Rebuild status file
+        shell: cmd
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git
+          cd vcpkg
+          git checkout 2025.07.25
+          cd ..
+          .\vcpkg\bootstrap-vcpkg.bat
+          .\vcpkg\vcpkg.exe install --triplet x86-windows --x-install-root=.\vcpkg_installed --no-downloads
+          .\vcpkg\vcpkg.exe install --triplet x64-windows --x-install-root=.\vcpkg_installed --no-downloads
+
+      - name: Package vcpkg dependencies
+        shell: cmd
+        run: |
+          cd vcpkg_installed
+          powershell -Command "Compress-Archive -Path .\\x86-windows -DestinationPath vcpkg_dependencies_x86-windows.zip"
+          powershell -Command "Compress-Archive -Path .\\x64-windows -DestinationPath vcpkg_dependencies_x64-windows.zip"
+          powershell -Command "Compress-Archive -Path .\\vcpkg -DestinationPath vcpkg_dependencies_vcpkg.zip"
+          dir
+
+      - name: Upload to GitHub Releases
+        if: github.event_name == 'workflow_dispatch'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: temptest
+          files: |
+            vcpkg_installed/vcpkg_dependencies_x86-windows.zip
+            vcpkg_installed/vcpkg_dependencies_x64-windows.zip
+            vcpkg_installed/vcpkg_dependencies_vcpkg.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
