@@ -51,9 +51,13 @@ jobs:
           cd vcpkg
           git checkout 2025.07.25
           cd ..
+          dir
           .\vcpkg\bootstrap-vcpkg.bat
+          dir
           .\vcpkg\vcpkg.exe install --triplet x86-windows --x-install-root=.\vcpkg_installed --no-downloads
           .\vcpkg\vcpkg.exe install --triplet x64-windows --x-install-root=.\vcpkg_installed --no-downloads
+          dir
+          .\vcpkg\vcpkg.exe list
 
       - name: Package vcpkg dependencies
         shell: cmd
