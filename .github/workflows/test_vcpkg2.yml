@@ -39,9 +39,9 @@ jobs:
         shell: cmd
         run: |
           set INSROOT=install-root-${{ matrix.myarch }}
-          .\vcpkg\vcpkg.exe export --zip --raw --output=vcpkg-deps-${{ matrix.myarch }}.zip --x-install-root=%INSROOT%
+          .\vcpkg\vcpkg.exe export --zip --raw --output-dir=vcpkg-deps-${{ matrix.myarch }} --x-install-root=%INSROOT%
 
       - uses: actions/upload-artifact@v4
         with:
           name: vcpkg-deps-${{ matrix.myarch }}
-          path: vcpkg-deps-${{ matrix.myarch }}.zip
+          path: vcpkg-deps-${{ matrix.myarch }}
