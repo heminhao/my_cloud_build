@@ -54,10 +54,8 @@ jobs:
           dir
           call .\vcpkg\bootstrap-vcpkg.bat
           dir
-          .\vcpkg\vcpkg.exe install --triplet x86-windows --x-install-root=.\vcpkg_installed --no-downloads
-          .\vcpkg\vcpkg.exe install --triplet x64-windows --x-install-root=.\vcpkg_installed --no-downloads
+          .\vcpkg\vcpkg.exe list --x-install-root=.\vcpkg_installed
           dir
-          .\vcpkg\vcpkg.exe list
 
       - name: Package vcpkg dependencies
         shell: cmd
