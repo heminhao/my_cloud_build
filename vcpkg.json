@@ -3,6 +3,10 @@
   "version-string": "0.1.0",
   "dependencies": [
     {
+      "name": "curl",
+      "version>=": "8.15.0"
+    },
+    {
       "name": "libwebsockets",
       "version>=": "4.3.5"
     },
